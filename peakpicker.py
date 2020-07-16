@@ -4,15 +4,16 @@ Bryant Moquist
 '''
 import numpy as np
 
-def find_thres(spectrogram,percentile,base):
+def find_thres(spectrogram,percentile,base,top=None):
     "Find the peak picking threshold for a particular spectrogram"
     dim = spectrogram.shape
-    window = spectrogram[0:dim[0],base:dim[1]]
+    top = top if top else dim[1]
+    window = spectrogram[0:dim[0],base:top]
     threshold = np.percentile(window, percentile)
 
     return threshold
 
-def peak_pick (S,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base):
+def peak_pick(S,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base,b=None):
     "Selects local peaks in a spectrogram and returns a list of tuples (time, freq, amplitude)" 
     "S is spectrogram matrix"
     "f_dim1,f_dim2,t_dim1,and t_dim2 are freq x time dimensions of the sliding window for first and second passes"
@@ -20,7 +21,7 @@ def peak_pick (S,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base):
     "base is the lowest frequency bin considered"
 
     a = len(S) #num of time bins
-    b = len(S[1]) #num of frequency bins
+    b = b if b else len(S[1]) #num of frequency bins
 
     peaks = []
     t_coords = []

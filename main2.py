@@ -29,6 +29,7 @@ if __name__ == '__main__':
     windowsize = 0.008     #set the window size  (0.008s = 64 samples)
     windowshift = 0.004    #set the window shift (0.004s = 32 samples)
     fftsize = 1024         #set the fft size (if srate = 8000, 1024 --> 513 freq. bins separated by 7.797 Hz from 0 to 4000Hz) 
+                                            #(if srate = 44100, 1024 --> 513 freq. bins separated by 42.982 Hz from 0 to 22050Hz) 
     
     #Peak picking dimensions 
     f_dim1 = 30
@@ -37,19 +38,20 @@ if __name__ == '__main__':
     t_dim2 = 20
     percentile = 70
     #base = 70 # lowest frequency bin used (peaks below are too common/not as useful for identification)
-    base = 15 # lowest frequency bin used (peaks below are too common/not as useful for identification)
-    #ref https://www.youtube.com/watch?v=qNf9nzvnd1k [20Hz to 20kHz (Human Audio Spectrum)]
+    base = 8 # lowest frequency bin used (peaks below are too common/not as useful for identification) = 320Hz
+    #watch [20Hz to 20kHz (Human Audio Spectrum)](https://www.youtube.com/watch?v=qNf9nzvnd1k), 60-15kHz for me
+    top = 375 # 375*42.982Hz = approx 15kHz
     high_peak_threshold = 75
     low_peak_threshold = 60
 
     #Hash parameters
     #delay_time = 250      # 250*0.004 = 1 second
     #delta_time = 250*3    # 750*0.004 = 3 seconds
-    #delta_freq = 128      # 128*7.797Hz = approx 1000Hz
+    #delta_freq = 128      # 128*42.982Hz = approx 5500Hz # 128*42.982Hz = approx 5500Hz
     #Hash parameters for short audio
-    delay_time = 50      # 250*0.004 = 1 second
-    delta_time = 50*3    # 750*0.004 = 3 seconds
-    delta_freq = 24      # 128*7.797Hz = approx 1000Hz
+    delay_time = 50      # 50*0.004 = 0.2 second
+    delta_time = 50*3    # 150*0.004 = 0.6 seconds
+    delta_freq = 12      # 12*42.982Hz = approx 516Hz
     
     #Time pair parameters
     TPdelta_freq = 4
@@ -66,11 +68,12 @@ if __name__ == '__main__':
     	print('Analyzing '+str(songnames[i]))
     	srate = songs[i][0]  #sample rate in samples/second
     	audio = songs[i][1]  #audio data    	
+        print('The srate of the audio is: '+str(srate))
     	spectrogram = tdft.tdft(audio, srate, windowsize, windowshift, fftsize)
     	time = spectrogram.shape[0]
     	freq = spectrogram.shape[1]
 
-    	threshold = pp.find_thres(spectrogram, percentile, base)
+        threshold = pp.find_thres(spectrogram, percentile, base, top)
 
     	print('The size of the spectrogram is time: '+str(time)+' and freq: '+str(freq))
         duration = time * windowshift
@@ -78,7 +81,7 @@ if __name__ == '__main__':
         durations.append(duration)
     	spectrodata.append(spectrogram)
 
-    	peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base)
+        peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base, top)
 
     	print('The initial number of peaks is:'+str(len(peaks)))
     	peaks = pp.reduce_peaks(peaks, fftsize, high_peak_threshold, low_peak_threshold)
