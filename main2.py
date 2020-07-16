@@ -36,7 +36,9 @@ if __name__ == '__main__':
     f_dim2 = 10
     t_dim2 = 20
     percentile = 70
-    base = 70 # lowest frequency bin used (peaks below are too common/not as useful for identification)
+    #base = 70 # lowest frequency bin used (peaks below are too common/not as useful for identification)
+    base = 15 # lowest frequency bin used (peaks below are too common/not as useful for identification)
+    #ref https://www.youtube.com/watch?v=qNf9nzvnd1k [20Hz to 20kHz (Human Audio Spectrum)]
     high_peak_threshold = 75
     low_peak_threshold = 60
 
