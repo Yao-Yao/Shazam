@@ -4,7 +4,7 @@ Proof of Concept
 Bryant Moquist
 '''
 from __future__ import print_function
-import scipy, pylab
+import pylab
 from scipy.io.wavfile import read
 import sys
 import peakpicker as pp
@@ -52,7 +52,8 @@ if __name__ == '__main__':
     TPdelta_time = 2
 
     #Construct the audio database of hashes
-    database = np.zeros((1,5))
+    database = np.zeros((0,5))
+    durations = []
     spectrodata = []
     peaksdata = []
 
@@ -68,6 +69,9 @@ if __name__ == '__main__':
     	threshold = pp.find_thres(spectrogram, percentile, base)
 
     	print('The size of the spectrogram is time: '+str(time)+' and freq: '+str(freq))
+        duration = time * windowshift
+        print('The duration of the song is: %.2f' % duration)
+        durations.append(duration)
     	spectrodata.append(spectrogram)
 
     	peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base)
@@ -76,11 +80,13 @@ if __name__ == '__main__':
     	peaks = pp.reduce_peaks(peaks, fftsize, high_peak_threshold, low_peak_threshold)
 
     	print('The reduced number of peaks is:'+str(len(peaks)))
+        print('The 3 front element of reduced peaks:'+str(peaks[:3]))
     	peaksdata.append(peaks)
 
     	#Calculate the hashMatrix for the database song file
     	songid = i
     	hashMatrix = fhash.hashPeaks(peaks,songid,delay_time,delta_time,delta_freq)
+        print('hashMatrix of shape:'+str(hashMatrix.shape))
 
         #Add to the song hash matrix to the database
     	database = np.concatenate((database,hashMatrix),axis=0)
@@ -132,7 +138,9 @@ if __name__ == '__main__':
     for i in timepairs:
     	offsets[index]=i[0]-i[1]
     	index = index+1
-    	songbins[i[2]] += 1
+    	songbins[int(i[2])] += 1
+    for i in range(numSongs):
+        songbins[i] = round(songbins[i] / durations[i])
 
     # Identify the song
     print('The sample song is: '+str(songnames[np.argmax(songbins)]))

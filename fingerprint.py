@@ -79,3 +79,24 @@ def findTimePairs(hash_database,sample_hash,deltaTime,deltaFreq):
                 continue
             
     return timePairs
+
+def findTimePairs2(hash_database,deltaTime,deltaFreq):
+    "Find the matching pairs between sample audio file and the songs in the database"
+
+    timePairs = []
+
+    # i: f0, f, delta_t, t0, id
+    for i in hash_database:
+        for j in hash_database:
+            if(i[0] > (j[0]-deltaFreq) and i[0] < (j[0] + deltaFreq)):
+                if(i[1] > (j[1]-deltaFreq) and i[1] < (j[1] + deltaFreq)):
+                    if(i[2] > (j[2]-deltaTime) and i[2] < (j[2] + deltaTime)):
+                        timePairs.append((j[3],i[3],j[4],i[4]))
+                    else:
+                        continue
+                else:
+                    continue
+            else:
+                continue
+            
+    return timePairs
