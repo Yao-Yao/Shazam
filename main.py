@@ -143,7 +143,7 @@ if __name__ == '__main__':
     	index = index+1
     	songbins[int(i[2])] += 1
     for i in range(numSongs):
-        songbins[i] = round(songbins[i] / durations[i] / sampleDuration)
+        songbins[i] = round(songbins[i] / durations[i] / sampleDuration * 100)
 
     # Identify the song
     print('The sample song is: '+str(songnames[np.argmax(songbins)]))
