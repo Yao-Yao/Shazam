@@ -112,8 +112,8 @@ if __name__ == '__main__':
     time = spectrogram.shape[0]
     freq = spectrogram.shape[1]
     print('The size of the spectrogram is time: '+str(time)+' and freq: '+str(freq))
-    duration = time * windowshift
-    print('The duration of the sample is: %.2f' % duration)
+    sampleDuration = time * windowshift
+    print('The duration of the sample is: %.2f' % sampleDuration)
 
     threshold = pp.find_thres(spectrogram, percentile, base)
     peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base)
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     	index = index+1
     	songbins[int(i[2])] += 1
     for i in range(numSongs):
-        songbins[i] = round(songbins[i] / durations[i])
+        songbins[i] = round(songbins[i] / durations[i] / sampleDuration)
 
     # Identify the song
     print('The sample song is: '+str(songnames[np.argmax(songbins)]))

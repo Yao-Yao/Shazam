@@ -10,6 +10,7 @@ import peakpicker as pp
 import fingerprint as fhash
 import numpy as np
 import tdft
+import math
 
 if __name__ == '__main__':
 
@@ -99,7 +100,7 @@ if __name__ == '__main__':
 
     #Compute number of matches by song id to determine a match
     numSongs = len(songs)
-    songbins= np.zeros((numSongs, numSongs))
+    songbins = np.zeros((numSongs, numSongs))
     numOffsets = len(timepairs)
     offsets = np.zeros(numOffsets)
     index = 0
@@ -107,9 +108,12 @@ if __name__ == '__main__':
     	offsets[index]=i[0]-i[1]
     	index = index+1
     	songbins[int(i[2])][int(i[3])] += 1
+    selfsim = np.zeros((numSongs, numSongs))
+    for i in range(numSongs):
+        selfsim[i][i] = songbins[i][i] / durations[i] / durations[i]
     for i in range(numSongs):
         for j in range(numSongs):
-            songbins[i][j] = round(songbins[i][j] / durations[i] / durations[j], 2)
+            songbins[i][j] = round(songbins[i][j] / durations[i] / durations[j] / math.sqrt(selfsim[i][i] * selfsim[j][j]), 2)
     print('Final similarity matrix:')
     np.set_printoptions(threshold=10000)
     print(songbins)
