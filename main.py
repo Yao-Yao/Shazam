@@ -146,7 +146,10 @@ if __name__ == '__main__':
         songbins[i] = round(songbins[i] / durations[i] / sampleDuration * 100)
 
     # Identify the song
-    print('The sample song is: '+str(songnames[np.argmax(songbins)]))
+    #print('The sample song is: '+str(songnames[np.argmax(songbins)]))
+    for i in songbins.argsort()[-3:][::-1]:
+        print('score:'+str(songbins[i]))
+        print('The sample song is: '+str(songnames[i]))
 
     # Plots 
     fig = []
