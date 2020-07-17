@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     for i in range(0,len(songs)):
 
-    	print('Analyzing '+str(songnames[i]))
+        print('Analyzing id='+str(i)+': '+str(songnames[i]))
     	srate = songs[i][0]  #sample rate in samples/second
     	audio = songs[i][1]  #audio data    	
     	spectrogram = tdft.tdft(audio, srate, windowsize, windowshift, fftsize)

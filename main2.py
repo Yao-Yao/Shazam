@@ -60,35 +60,28 @@ if __name__ == '__main__':
     #Construct the audio database of hashes
     database = np.zeros((0,5))
     durations = []
-    spectrodata = []
-    peaksdata = []
 
     for i in range(0,len(songs)):
-
-    	print('Analyzing '+str(songnames[i]))
+        print('Analyzing id='+str(i)+': '+str(songnames[i]))
     	srate = songs[i][0]  #sample rate in samples/second
     	audio = songs[i][1]  #audio data    	
         print('The srate of the audio is: '+str(srate))
+
     	spectrogram = tdft.tdft(audio, srate, windowsize, windowshift, fftsize)
     	time = spectrogram.shape[0]
     	freq = spectrogram.shape[1]
-
-        threshold = pp.find_thres(spectrogram, percentile, base, top)
-
     	print('The size of the spectrogram is time: '+str(time)+' and freq: '+str(freq))
         duration = time * windowshift
         print('The duration of the song is: %.2f' % duration)
         durations.append(duration)
-    	spectrodata.append(spectrogram)
 
+        threshold = pp.find_thres(spectrogram, percentile, base, top)
         peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base, top)
-
     	print('The initial number of peaks is:'+str(len(peaks)))
-    	peaks = pp.reduce_peaks(peaks, fftsize, high_peak_threshold, low_peak_threshold)
 
+        peaks = pp.reduce_peaks(peaks, fftsize, high_peak_threshold, low_peak_threshold)
     	print('The reduced number of peaks is:'+str(len(peaks)))
         print('The 3 front element of reduced peaks:'+str(peaks[:3]))
-    	peaksdata.append(peaks)
 
     	#Calculate the hashMatrix for the database song file
     	songid = i
