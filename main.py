@@ -24,8 +24,8 @@ if __name__ == '__main__':
 
     for i in range(1,num_inputs):
     	songs.append(read(sys.argv[i]))
-    	name = sys.argv[i].split(separator,1)[0]
-    	songnames.append(name)
+        name = sys.argv[i].rsplit(separator,1)[0]
+        songnames.append(name)
 
     #TDFT parameters
     windowsize = 0.008     #set the window size  (0.008s = 64 samples)

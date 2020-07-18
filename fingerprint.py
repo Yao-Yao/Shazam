@@ -7,14 +7,16 @@ import numpy as np
 
 def findAdjPts(index,A,delay_time,delta_time,delta_freq):
     "Find the three closest adjacent points to the anchor point"    
+    t0, f0, amp0 = A[index]
     adjPts = []
-    low_x = A[index][0]+delay_time
+    low_x = t0+delay_time
     high_x = low_x+delta_time
-    low_y = A[index][1]-delta_freq/2
-    high_y = A[index][1]+delta_freq/2
+    low_y = f0-delta_freq/2
+    high_y = f0+delta_freq/2
     
     for i in A:
-        if ((i[0]>low_x and i[0]<high_x) and (i[1]>low_y and i[1]<high_y)):
+        t, f, amp = i
+        if ((t>low_x and t<high_x) and (f>low_y and f<high_y)):
             adjPts.append(i)
             
     return adjPts
@@ -25,13 +27,15 @@ def hashPeaks(A,songID,delay_time,delta_time,delta_freq):
     index = 0
     numPeaks = len(A)
     for i in range(0,numPeaks):
+        t0, f0, amp0 = A[i]
         adjPts = findAdjPts(i,A,delay_time,delta_time,delta_freq)
         adjNum=len(adjPts)
         for j in range(0,adjNum):
-            hashMatrix[index][0] = A[i][1]
-            hashMatrix[index][1] = adjPts[j][1]
-            hashMatrix[index][2] = adjPts[j][0]-A[i][0]
-            hashMatrix[index][3] = A[i][0]
+            t, f, amp = adjPts[j]
+            hashMatrix[index][0] = f0
+            hashMatrix[index][1] = f
+            hashMatrix[index][2] = t-t0
+            hashMatrix[index][3] = t0
             hashMatrix[index][4] = songID
             index=index+1
     
@@ -46,13 +50,15 @@ def hashSamplePeaks(A,delay_time,delta_time,delta_freq):
     index = 0
     numPeaks = len(A)
     for i in range(0,numPeaks):
+        t0, f0, amp0 = A[i]
         adjPts = findAdjPts(i,A,delay_time,delta_time,delta_freq)
         adjNum = len(adjPts)
         for j in range(0,adjNum):
-            hashMatrix[index][0] = A[i][1]
-            hashMatrix[index][1] = adjPts[j][1]
-            hashMatrix[index][2] = adjPts[j][0]-A[i][0]
-            hashMatrix[index][3] = A[i][0]
+            t, f, amp = adjPts[j]
+            hashMatrix[index][0] = f0
+            hashMatrix[index][1] = f
+            hashMatrix[index][2] = t-t0
+            hashMatrix[index][3] = t0
             index=index+1
 
     hashMatrix = hashMatrix[~np.all(hashMatrix==0,axis=1)]
@@ -66,11 +72,13 @@ def findTimePairs(hash_database,sample_hash,deltaTime,deltaFreq):
     timePairs = []
 
     for i in sample_hash:
+        f0, f, dt, t0 = i
         for j in hash_database:
-            if(i[0] > (j[0]-deltaFreq) and i[0] < (j[0] + deltaFreq)):
-                if(i[1] > (j[1]-deltaFreq) and i[1] < (j[1] + deltaFreq)):
-                    if(i[2] > (j[2]-deltaTime) and i[2] < (j[2] + deltaTime)):
-                        timePairs.append((j[3],i[3],j[4]))
+            _f0, _f, _dt, _t0, _songID = j
+            if(f0 > (_f0-deltaFreq) and f0 < (_f0 + deltaFreq)):
+                if(f > (_f-deltaFreq) and f < (_f + deltaFreq)):
+                    if(dt > (_dt-deltaTime) and dt < (_dt + deltaTime)):
+                        timePairs.append((_t0,t0,_songID))
                     else:
                         continue
                 else:
@@ -85,13 +93,14 @@ def findTimePairs2(hash_database,deltaTime,deltaFreq):
 
     timePairs = []
 
-    # i: f0, f, delta_t, t0, id
     for i in hash_database:
+        f0, f, dt, t0, songID = i
         for j in hash_database:
-            if(i[0] > (j[0]-deltaFreq) and i[0] < (j[0] + deltaFreq)):
-                if(i[1] > (j[1]-deltaFreq) and i[1] < (j[1] + deltaFreq)):
-                    if(i[2] > (j[2]-deltaTime) and i[2] < (j[2] + deltaTime)):
-                        timePairs.append((j[3],i[3],j[4],i[4]))
+            _f0, _f, _dt, _t0, _songID = j
+            if(f0 > (_f0-deltaFreq) and f0 < (_f0 + deltaFreq)):
+                if(f > (_f-deltaFreq) and f < (_f + deltaFreq)):
+                    if(dt > (_dt-deltaTime) and dt < (_dt + deltaTime)):
+                        timePairs.append((_t0,t0,_songID,songID))
                     else:
                         continue
                 else:

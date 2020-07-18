@@ -86,7 +86,8 @@ def reduce_peaks(peaks,fftsize,high_peak_threshold,low_peak_threshold):
     high_peaks = []
 
     for item in peaks:
-        if(item[1]>(fftsize/4)):
+        t, f, amp = item
+        if(f>(fftsize/4)):
             high_peaks.append(item)
         else:
             low_peaks.append(item)
@@ -94,13 +95,14 @@ def reduce_peaks(peaks,fftsize,high_peak_threshold,low_peak_threshold):
     #Eliminate peaks based on respective thresholds in the low and high frequency regions.  
     reduced_peaks = []
     for item in peaks:
-        if(item[1]>(fftsize/4)):
-            if(item[2]>np.percentile(high_peaks,high_peak_threshold,axis=0)[2]):
+        t, f, amp = item
+        if(f>(fftsize/4)):
+            if(amp>np.percentile(high_peaks,high_peak_threshold,axis=0)[2]):
                 reduced_peaks.append(item)
             else:
                 continue
         else:
-            if(item[2]>np.percentile(low_peaks,low_peak_threshold,axis=0)[2]):
+            if(amp>np.percentile(low_peaks,low_peak_threshold,axis=0)[2]):
                 reduced_peaks.append(item)
             else:
                 continue

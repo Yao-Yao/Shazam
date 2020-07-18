@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     for i in range(1,num_inputs):
     	songs.append(read(sys.argv[i]))
-    	name = sys.argv[i].split(separator,1)[0]
+        name = sys.argv[i].rsplit(separator,1)[0]
     	songnames.append(name)
 
     #TDFT parameters
@@ -104,10 +104,10 @@ if __name__ == '__main__':
     numOffsets = len(timepairs)
     offsets = np.zeros(numOffsets)
     index = 0
-    for i in timepairs:
-    	offsets[index]=i[0]-i[1]
+    for _t0, t0, _songID, songID in timepairs:
+        offsets[index]=_t0-t0
     	index = index+1
-    	songbins[int(i[2])][int(i[3])] += 1
+        songbins[int(_songID)][int(songID)] += 1
     selfsim = np.zeros((numSongs, numSongs))
     for i in range(numSongs):
         selfsim[i][i] = songbins[i][i] / durations[i] / durations[i]
