@@ -31,24 +31,25 @@ class DisjointSet(object):
                 self.leader[a] = self.leader[b] = a
                 self.group[a] = set([a, b])
 
-a = np.genfromtxt('result.csv', delimiter=',')
+simmat = np.genfromtxt('result.csv', delimiter=',')
 print 'result:'
-print a.shape
-print a
+nrow, ncol = simmat.shape
+print simmat.shape
+print simmat
 
 ds = DisjointSet()
 s=set()
 with np.errstate(invalid='ignore'):
     np.set_printoptions(threshold=10000)
-    x, y = np.where(a > 0.8)
+    x, y = np.where(simmat > 0.8)
 for i, px in enumerate(x):
     py = y[i]
     if py != px:
-        print px, py, a[px][py]
+        print px, py, simmat[px][py]
         ds.add(px, py)
     if py == px:
         s.add(px)
 pp(ds.leader)
 pp(ds.group)
 
-print 'nan: ', set(range(0,1775)) - s
+print 'nan: ', set(range(0,nrow)) - s
