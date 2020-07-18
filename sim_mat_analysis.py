@@ -38,6 +38,7 @@ print simmat.shape
 print simmat
 
 ds = DisjointSet()
+selfsim=set()
 s=set()
 with np.errstate(invalid='ignore'):
     np.set_printoptions(threshold=10000)
@@ -45,11 +46,13 @@ with np.errstate(invalid='ignore'):
 for i, px in enumerate(x):
     py = y[i]
     if py != px:
-        print px, py, simmat[px][py]
-        ds.add(px, py)
+        if (px, py) not in s:
+            print px, py, simmat[px][py]
+            s.add((py, px))
+            ds.add(px, py)
     if py == px:
-        s.add(px)
+        selfsim.add(px)
 pp(ds.leader)
 pp(ds.group)
 
-print 'nan: ', set(range(0,nrow)) - s
+print 'nan: ', set(range(0,nrow)) - selfsim
