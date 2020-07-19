@@ -22,9 +22,9 @@ if __name__ == '__main__':
     separator = '.'
 
     for i in range(1,num_inputs):
-    	songs.append(read(sys.argv[i]))
+        songs.append(read(sys.argv[i]))
         name = sys.argv[i].rsplit(separator,1)[0]
-    	songnames.append(name)
+        songnames.append(name)
 
     #TDFT parameters
     windowsize = 0.008     #set the window size  (0.008s = 64 samples)
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     #Hash parameters
     #delay_time = 250      # 250*0.004 = 1 second
     #delta_time = 250*3    # 750*0.004 = 3 seconds
-    #delta_freq = 128      # 128*42.982Hz = approx 5500Hz # 128*42.982Hz = approx 5500Hz
+    #delta_freq = 128      # 128*42.982Hz = approx 5500Hz
     #Hash parameters for short audio
     delay_time = 50      # 50*0.004 = 0.2 second
     delta_time = 50*3    # 150*0.004 = 0.6 seconds
@@ -64,33 +64,33 @@ if __name__ == '__main__':
 
     for i in range(0,len(songs)):
         print('Analyzing id='+str(i)+': '+str(songnames[i]))
-    	srate = songs[i][0]  #sample rate in samples/second
-    	audio = songs[i][1]  #audio data    	
+        srate = songs[i][0]  #sample rate in samples/second
+        audio = songs[i][1]  #audio data        
         print('The srate of the audio is: '+str(srate))
 
-    	spectrogram = tdft.tdft(audio, srate, windowsize, windowshift, fftsize)
-    	time = spectrogram.shape[0]
-    	freq = spectrogram.shape[1]
-    	print('The size of the spectrogram is time: '+str(time)+' and freq: '+str(freq))
+        spectrogram = tdft.tdft(audio, srate, windowsize, windowshift, fftsize)
+        time = spectrogram.shape[0]
+        freq = spectrogram.shape[1]
+        print('The size of the spectrogram is time: '+str(time)+' and freq: '+str(freq))
         duration = time * windowshift
         print('The duration of the song is: %.2f' % duration)
         durations.append(duration)
 
         threshold = pp.find_thres(spectrogram, percentile, base, top)
         peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base, top)
-    	print('The initial number of peaks is:'+str(len(peaks)))
+        print('The initial number of peaks is:'+str(len(peaks)))
 
         peaks = pp.reduce_peaks(peaks, fftsize, high_peak_threshold, low_peak_threshold)
-    	print('The reduced number of peaks is:'+str(len(peaks)))
+        print('The reduced number of peaks is:'+str(len(peaks)))
         print('The 3 front element of reduced peaks:'+str(peaks[:3]))
 
-    	#Calculate the hashMatrix for the database song file
-    	songid = i
-    	hashMatrix = fhash.hashPeaks(peaks,songid,delay_time,delta_time,delta_freq)
+        #Calculate the hashMatrix for the database song file
+        songid = i
+        hashMatrix = fhash.hashPeaks(peaks,songid,delay_time,delta_time,delta_freq)
         print('hashMatrix of shape:'+str(hashMatrix.shape))
 
         #Add to the song hash matrix to the database
-    	database = np.concatenate((database,hashMatrix),axis=0)
+        database = np.concatenate((database,hashMatrix),axis=0)
         print('database of shape:'+str(database.shape))
         print()
 
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     index = 0
     for _t0, t0, _songID, songID in timepairs:
         offsets[index]=_t0-t0
-    	index = index+1
+        index = index+1
         songbins[int(_songID)][int(songID)] += 1
     selfsim = np.zeros((numSongs, numSongs))
     for i in range(numSongs):
