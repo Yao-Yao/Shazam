@@ -114,8 +114,10 @@ if __name__ == '__main__':
     for i in range(numSongs):
         for j in range(numSongs):
             songbins[i][j] = round(songbins[i][j] / durations[i] / durations[j] / math.sqrt(selfsim[i][i] * selfsim[j][j]), 2)
-    print('Final similarity matrix:')
     np.set_printoptions(threshold=10000)
+    print('Self similarity matrix:')
+    print(selfsim)
+    print('Total similarity matrix:')
     print(songbins)
     np.savetxt("result.csv", songbins, delimiter=',')
 
