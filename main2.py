@@ -40,7 +40,7 @@ if __name__ == '__main__':
     percentile = 70
     #base = 70 # lowest frequency bin used (peaks below are too common/not as useful for identification)
     base = 8 # lowest frequency bin used (peaks below are too common/not as useful for identification) = 320Hz
-    #watch [20Hz to 20kHz (Human Audio Spectrum)](https://www.youtube.com/watch?v=qNf9nzvnd1k), 60-15kHz for me
+    #watch [20Hz to 20kHz (Human Audio Spectrum)](https://www.youtube.com/watch?v=qNf9nzvnd1k), 60-15kHz in my case
     top = 375 # 375*42.982Hz = approx 15kHz
     high_peak_threshold = 75
     low_peak_threshold = 60
@@ -100,24 +100,24 @@ if __name__ == '__main__':
 
     #Compute number of matches by song id to determine a match
     numSongs = len(songs)
-    songbins = np.zeros((numSongs, numSongs))
+    sim_matrix = np.zeros((numSongs, numSongs))
     numOffsets = len(timepairs)
     offsets = np.zeros(numOffsets)
     index = 0
     for _t0, t0, _songID, songID in timepairs:
         offsets[index]=_t0-t0
         index = index+1
-        songbins[int(_songID)][int(songID)] += 1
+        sim_matrix[int(_songID)][int(songID)] += 1
     selfsim = np.zeros((numSongs, numSongs))
     for i in range(numSongs):
-        selfsim[i][i] = songbins[i][i] / durations[i] / durations[i]
+        selfsim[i][i] = sim_matrix[i][i] / durations[i] / durations[i]
     for i in range(numSongs):
         for j in range(numSongs):
-            songbins[i][j] = round(songbins[i][j] / durations[i] / durations[j] / math.sqrt(selfsim[i][i] * selfsim[j][j]), 2)
+            sim_matrix[i][j] = round(sim_matrix[i][j] / durations[i] / durations[j] / math.sqrt(selfsim[i][i] * selfsim[j][j]), 2)
     np.set_printoptions(threshold=10000)
     print('Self similarity matrix:')
     print(selfsim)
     print('Total similarity matrix:')
-    print(songbins)
-    np.savetxt("result.csv", songbins, delimiter=',')
+    print(sim_matrix)
+    np.savetxt("result.csv", sim_matrix, delimiter=',')
 
