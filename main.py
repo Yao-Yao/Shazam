@@ -20,12 +20,14 @@ if __name__ == '__main__':
     #Song files to be hashed into database
     songs = []
     songnames = []
+    shortnames = []
     separator = '.'
 
     for i in range(1,num_inputs):
     	songs.append(read(sys.argv[i]))
         name = sys.argv[i].rsplit(separator,1)[0]
         songnames.append(name)
+        shortnames.append(name.rsplit('/')[-1][-10:])
 
     #TDFT parameters
     windowsize = 0.008     #set the window size  (0.008s = 64 samples)
@@ -185,8 +187,15 @@ if __name__ == '__main__':
     rects1 = ax.bar(ind,songbins,width,color='blue',align='center')
     ax.set_ylabel('Number of Matches')
     ax.set_xticks(ind)
-    xtickNames = ax.set_xticklabels(songnames)
+    xtickNames = ax.set_xticklabels(shortnames)
     matplotlib.pyplot.setp(xtickNames)
+    for rect in rects1:
+        height = rect.get_height()
+        ax.annotate('{}'.format(height),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
     pylab.title('Song Identification') 
     fig3.show()
 
