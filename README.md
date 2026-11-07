@@ -37,7 +37,7 @@ Shazam/
 
 ## Dependencies
 
-- Python 2.7
+- Python 3.10
 - NumPy
 - SciPy
 - Matplotlib (for visualization in main.py)
@@ -50,9 +50,17 @@ Shazam/
    cd Shazam
    ```
 
-2. Install required Python packages:
+2. Create and activate a virtual environment (recommended):
    ```bash
-   pip install numpy scipy matplotlib
+   python3.10 -m venv .venv
+   source .venv/bin/activate          # macOS / Linux
+   .venv\Scripts\activate             # Windows
+   python -m pip install --upgrade pip
+   ```
+
+3. Install required Python packages:
+   ```bash
+   python -m pip install -r requirements.txt
    ```
 
 ## Usage
@@ -147,18 +155,16 @@ The system was tested with 5 popular songs (30-second clips at 8000kHz):
 
 ## Limitations
 
-1. **Python 2.7**: Code is written for Python 2.7 and may require modification for Python 3
-2. **Audio Format**: Currently supports WAV files; MP4 files require conversion
-3. **Performance**: Matching algorithm uses brute-force search; could be optimized with indexing
-4. **Robustness**: Performance degrades with significant noise and compression artifacts
+1. **Audio Format**: Currently supports WAV files; other formats require conversion (see `util/mp4_to_wav.sh`).
+2. **Performance**: Matching algorithm uses brute-force search; could be optimized with indexing.
+3. **Robustness**: Performance degrades with significant noise and compression artifacts.
 
 ## Future Improvements
 
-1. Port to Python 3
-2. Implement database indexing for faster search
-3. Add support for more audio formats
-4. Improve noise robustness
-5. Develop web interface or API
+1. Implement database indexing for faster search.
+2. Add support for more audio formats.
+3. Improve noise robustness.
+4. Develop web interface or API.
 
 ## License
 
