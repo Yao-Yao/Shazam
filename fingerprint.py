@@ -11,8 +11,8 @@ def findAdjPts(index,A,delay_time,delta_time,delta_freq):
     adjPts = []
     low_x = t0+delay_time
     high_x = low_x+delta_time
-    low_y = f0-delta_freq/2
-    high_y = f0+delta_freq/2
+    low_y = f0-delta_freq//2
+    high_y = f0+delta_freq//2
     
     for i in A:
         t, f, amp = i
@@ -23,47 +23,40 @@ def findAdjPts(index,A,delay_time,delta_time,delta_freq):
     
 def hashPeaks(A,songID,delay_time,delta_time,delta_freq):
     "Create a matrix of peaks hashed as: [[freq_anchor, freq_other, delta_time], time_anchor, songID]"
-    hashMatrix = np.zeros((len(A)*100,5))  #Assume size limitation
-    index = 0
+    rows = []
     numPeaks = len(A)
     for i in range(0,numPeaks):
         t0, f0, amp0 = A[i]
         adjPts = findAdjPts(i,A,delay_time,delta_time,delta_freq)
-        adjNum=len(adjPts)
-        for j in range(0,adjNum):
-            t, f, amp = adjPts[j]
-            hashMatrix[index][0] = f0
-            hashMatrix[index][1] = f
-            hashMatrix[index][2] = t-t0
-            hashMatrix[index][3] = t0
-            hashMatrix[index][4] = songID
-            index=index+1
-    
-    hashMatrix = hashMatrix[~np.all(hashMatrix==0,axis=1)]
-    hashMatrix = np.sort(hashMatrix,axis=0)
-        
+        for t, f, amp in adjPts:
+            rows.append((f0, f, t-t0, t0, songID))
+
+    if not rows:
+        return np.zeros((0,5))
+
+    hashMatrix = np.array(rows)
+    #Sort rows as a unit so that the values inside each hash stay associated.
+    hashMatrix = hashMatrix[np.lexsort((hashMatrix[:,2],hashMatrix[:,1],hashMatrix[:,0]))]
+
     return hashMatrix
 
 def hashSamplePeaks(A,delay_time,delta_time,delta_freq):
     "Create a matrix of peaks hashed as: [[freq_anchor, freq_other, delta_time],time_anchor]"
-    hashMatrix = np.zeros((len(A)*100,4))
-    index = 0
+    rows = []
     numPeaks = len(A)
     for i in range(0,numPeaks):
         t0, f0, amp0 = A[i]
         adjPts = findAdjPts(i,A,delay_time,delta_time,delta_freq)
-        adjNum = len(adjPts)
-        for j in range(0,adjNum):
-            t, f, amp = adjPts[j]
-            hashMatrix[index][0] = f0
-            hashMatrix[index][1] = f
-            hashMatrix[index][2] = t-t0
-            hashMatrix[index][3] = t0
-            index=index+1
+        for t, f, amp in adjPts:
+            rows.append((f0, f, t-t0, t0))
 
-    hashMatrix = hashMatrix[~np.all(hashMatrix==0,axis=1)]
-    hashMatrix = np.sort(hashMatrix,axis=0)
-        
+    if not rows:
+        return np.zeros((0,4))
+
+    hashMatrix = np.array(rows)
+    #Sort rows as a unit so that the values inside each hash stay associated.
+    hashMatrix = hashMatrix[np.lexsort((hashMatrix[:,3],hashMatrix[:,2],hashMatrix[:,1],hashMatrix[:,0]))]
+
     return hashMatrix
 
 def findTimePairs(hash_database,sample_hash,deltaTime,deltaFreq):

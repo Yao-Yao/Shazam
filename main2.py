@@ -110,10 +110,15 @@ if __name__ == '__main__':
         sim_matrix[int(_songID)][int(songID)] += 1
     selfsim = np.zeros((numSongs, numSongs))
     for i in range(numSongs):
-        selfsim[i][i] = sim_matrix[i][i] / durations[i] / durations[i]
+        if durations[i]:
+            selfsim[i][i] = sim_matrix[i][i] / durations[i] / durations[i]
     for i in range(numSongs):
         for j in range(numSongs):
-            sim_matrix[i][j] = round(sim_matrix[i][j] / durations[i] / durations[j] / math.sqrt(selfsim[i][i] * selfsim[j][j]), 2)
+            denom = durations[i] * durations[j] * math.sqrt(selfsim[i][i] * selfsim[j][j])
+            if denom:
+                sim_matrix[i][j] = round(sim_matrix[i][j] / denom, 2)
+            else:
+                sim_matrix[i][j] = 0.0
     np.set_printoptions(threshold=10000)
     print('Self similarity matrix:')
     print(selfsim)

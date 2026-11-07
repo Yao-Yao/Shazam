@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 from pprint import pprint as pp
 
@@ -32,10 +33,10 @@ class DisjointSet(object):
                 self.group[a] = set([a, b])
 
 simmat = np.genfromtxt('result.csv', delimiter=',')
-print 'result:'
+print('result:')
 nrow, ncol = simmat.shape
-print simmat.shape
-print simmat
+print(simmat.shape)
+print(simmat)
 
 ds = DisjointSet()
 selfsim=set()
@@ -47,7 +48,7 @@ for i, px in enumerate(x):
     py = y[i]
     if py != px:
         if (px, py) not in s:
-            print px, py, simmat[px][py]
+            print(px, py, simmat[px][py])
             s.add((py, px))
             ds.add(px, py)
     if py == px:
@@ -55,4 +56,4 @@ for i, px in enumerate(x):
 pp(ds.leader)
 pp(ds.group)
 
-print 'nan: ', set(range(0,nrow)) - selfsim
+print('nan: ', set(range(0,nrow)) - selfsim)

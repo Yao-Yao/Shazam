@@ -24,7 +24,7 @@ if __name__ == '__main__':
     separator = '.'
 
     for i in range(1,num_inputs):
-    	songs.append(read(sys.argv[i]))
+        songs.append(read(sys.argv[i]))
         name = sys.argv[i].rsplit(separator,1)[0]
         songnames.append(name)
         shortnames.append(name.rsplit('/')[-1][-10:])
@@ -68,33 +68,33 @@ if __name__ == '__main__':
 
     for i in range(0,len(songs)):
         print('Analyzing id='+str(i)+': '+str(songnames[i]))
-    	srate = songs[i][0]  #sample rate in samples/second
-    	audio = songs[i][1]  #audio data    	
-    	spectrogram = tdft.tdft(audio, srate, windowsize, windowshift, fftsize)
-    	spectrodata.append(spectrogram)
-    	time = spectrogram.shape[0]
-    	freq = spectrogram.shape[1]
-    	print('The size of the spectrogram is time: '+str(time)+' and freq: '+str(freq))
+        srate = songs[i][0]  #sample rate in samples/second
+        audio = songs[i][1]  #audio data
+        spectrogram = tdft.tdft(audio, srate, windowsize, windowshift, fftsize)
+        spectrodata.append(spectrogram)
+        time = spectrogram.shape[0]
+        freq = spectrogram.shape[1]
+        print('The size of the spectrogram is time: '+str(time)+' and freq: '+str(freq))
         duration = time * windowshift
         print('The duration of the song is: %.2f' % duration)
         durations.append(duration)
 
-    	threshold = pp.find_thres(spectrogram, percentile, base)
-    	peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base)
-    	print('The initial number of peaks is:'+str(len(peaks)))
+        threshold = pp.find_thres(spectrogram, percentile, base, top)
+        peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base,top)
+        print('The initial number of peaks is:'+str(len(peaks)))
 
-    	peaks = pp.reduce_peaks(peaks, fftsize, high_peak_threshold, low_peak_threshold)
-    	print('The reduced number of peaks is:'+str(len(peaks)))
+        peaks = pp.reduce_peaks(peaks, fftsize, high_peak_threshold, low_peak_threshold)
+        print('The reduced number of peaks is:'+str(len(peaks)))
         print('The 3 front element of reduced peaks:'+str(peaks[:3]))
-    	peaksdata.append(peaks)
+        peaksdata.append(peaks)
 
-    	#Calculate the hashMatrix for the database song file
-    	songid = i
-    	hashMatrix = fhash.hashPeaks(peaks,songid,delay_time,delta_time,delta_freq)
+        #Calculate the hashMatrix for the database song file
+        songid = i
+        hashMatrix = fhash.hashPeaks(peaks,songid,delay_time,delta_time,delta_freq)
         print('hashMatrix of shape:'+str(hashMatrix.shape))
 
         #Add to the song hash matrix to the database
-    	database = np.concatenate((database,hashMatrix),axis=0)
+        database = np.concatenate((database,hashMatrix),axis=0)
 
 
     print('The dimensions of the database hash matrix: '+str(database.shape))
@@ -103,13 +103,17 @@ if __name__ == '__main__':
     # Audio sample to be analyzed and identified
 
     print('Please enter an audio sample file to identify: ')
-    userinput = raw_input('---> ')
+    try:
+        input_func = raw_input
+    except NameError:
+        input_func = input
+    userinput = input_func('---> ')
     sample = read(userinput)
-    userinput = userinput.split(separator,1)[0]
+    userinput = userinput.rsplit(separator,1)[0]
 
     print('Analyzing the audio sample: '+str(userinput))
     srate = sample[0]  #sample rate in samples/second
-    audio = sample[1]  #audio data    	
+    audio = sample[1]  #audio data
     spectrogram = tdft.tdft(audio, srate, windowsize, windowshift, fftsize)
     time = spectrogram.shape[0]
     freq = spectrogram.shape[1]
@@ -117,8 +121,8 @@ if __name__ == '__main__':
     sampleDuration = time * windowshift
     print('The duration of the sample is: %.2f' % sampleDuration)
 
-    threshold = pp.find_thres(spectrogram, percentile, base)
-    peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base)
+    threshold = pp.find_thres(spectrogram, percentile, base, top)
+    peaks = pp.peak_pick(spectrogram,f_dim1,t_dim1,f_dim2,t_dim2,threshold,base,top)
     print('The initial number of peaks is:'+str(len(peaks)))
 
     peaks = pp.reduce_peaks(peaks, fftsize, high_peak_threshold, low_peak_threshold)
@@ -141,9 +145,9 @@ if __name__ == '__main__':
     offsets = np.zeros(numOffsets)
     index = 0
     for i in timepairs:
-    	offsets[index]=i[0]-i[1]
-    	index = index+1
-    	songbins[int(i[2])] += 1
+        offsets[index]=i[0]-i[1]
+        index = index+1
+        songbins[int(i[2])] += 1
     for i in range(numSongs):
         songbins[i] = round(songbins[i] / durations[i] / sampleDuration * 100)
 
@@ -161,7 +165,8 @@ if __name__ == '__main__':
         fig1 = pylab.figure(i)
         peaks = peaksdata[i]
         pylab.imshow(spectrodata[i].T,origin='lower', aspect='auto', interpolation='nearest')
-        pylab.scatter(*zip(*peaks), marker='.', color='blue')
+        if peaks:
+            pylab.scatter(*zip(*peaks), marker='.', color='blue')
         pylab.title(str(songnames[i])+' Spectrogram and Selected Peaks') 
         pylab.xlabel('Time')    
         pylab.ylabel('Frequency Bin')
@@ -173,7 +178,8 @@ if __name__ == '__main__':
 
     fig2 = pylab.figure(1002)
     pylab.imshow(sampleSpectro.T,origin='lower', aspect='auto', interpolation='nearest')
-    pylab.scatter(*zip(*samplePeaks), marker='.', color='blue')
+    if samplePeaks:
+        pylab.scatter(*zip(*samplePeaks), marker='.', color='blue')
     pylab.title('Sample File: '+str(userinput)+' Spectrogram and Selected Peaks') 
     pylab.xlabel('Time')    
     pylab.ylabel('Frequency Bin')
@@ -188,7 +194,7 @@ if __name__ == '__main__':
     ax.set_ylabel('Number of Matches')
     ax.set_xticks(ind)
     xtickNames = ax.set_xticklabels(shortnames)
-    matplotlib.pyplot.setp(xtickNames)
+    matplotlib.pyplot.setp(xtickNames, rotation=45, fontsize=8)
     for rect in rects1:
         height = rect.get_height()
         ax.annotate('{}'.format(height),
